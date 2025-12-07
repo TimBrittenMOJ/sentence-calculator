@@ -1,0 +1,43 @@
+
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+}
+.quick-links .sep { margin: 0 0.35rem; color: #505a5f; }
+.govuk-warning-text { align-items: center; }
+#componentsBody .govuk-button { margin-bottom: 0; }
+.govuk-summary-list__value { word-break: break-word; }
+
+.sentence-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #b1b4b6;
+}
+.sentence-tab {
+  background: #f3f2f1;
+  border: 1px solid #b1b4b6;
+  border-bottom: 3px solid transparent;
+  border-radius: 4px 4px 0 0;
+  padding: 0.5rem 0.9rem;
+  font-weight: 700;
+  color: #0b0c0c;
+  cursor: pointer;
+}
+.sentence-tab--active {
+  background: #ffffff;
+  border-color: #1d70b8;
+  border-bottom-color: #ffffff;
+  color: #1d70b8;
+}
+.sentence-tab:hover {
+  background: #e7e6e3;
+}
+.sentence-tab:focus {
+  outline: 3px solid #ffbf47;
+  outline-offset: 1px;
+}
