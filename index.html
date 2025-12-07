@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+<head>
+  <meta charset="utf-8">
+  <title>Term Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0c0c">
+
+  <!-- Local GOV.UK Frontend CSS -->
+  <link rel="stylesheet" href="vendor/govuk-frontend.min.css">
+  <!-- Custom overrides -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="govuk-template__body">
+  <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+
+  <header class="govuk-header" role="banner" data-module="govuk-header">
+    <div class="govuk-header__container govuk-width-container">
+      <div class="govuk-header__logo">
+        <a href="#" class="govuk-header__link govuk-header__link--homepage">
+          <span class="govuk-header__logotype-text">GOV.UK</span>
+        </a>
+      </div>
+      <div class="govuk-header__content">
+        <a href="#" class="govuk-header__link govuk-header__service-name">Term Calculator</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="govuk-main-wrapper" id="main-content" role="main">
+    <div class="govuk-width-container">
+      <div class="govuk-warning-text govuk-!-margin-bottom-6">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">Internal experimental draft &mdash; do not use in live court</strong>
+      </div>
+
+      <h1 class="govuk-heading-xl">Sentencing calculator</h1>
+      <p class="govuk-body">Calculate a sentence end date, earliest release date, and total days for all sentence types.</p>
+
+      <div id="error-summary"></div>
+
+      <form id="term-calc-form" class="govuk-form-group" novalidate>
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Sentence inputs</legend>
+          <span class="govuk-hint">Choose a tab to switch calculators, then enter the sentence date and term.</span>
+
+          <input type="hidden" id="sentenceType" name="sentenceType" value="life">
+          <div class="sentence-tabs" id="sentenceTabs" role="tablist" aria-label="Sentence type">
+            <button type="button" class="sentence-tab sentence-tab--active" data-type="life" role="tab" aria-selected="true" aria-controls="lifeInputs" id="tab-life">Life (indeterminate)</button>
+            <button type="button" class="sentence-tab" data-type="determinate" role="tab" aria-selected="false" aria-controls="determinateInputs" id="tab-determinate" tabindex="-1">Determinate</button>
+            <button type="button" class="sentence-tab" data-type="aggregate" role="tab" aria-selected="false" aria-controls="aggregateInputs" id="tab-aggregate" tabindex="-1">Aggregate</button>
+            <button type="button" class="sentence-tab" data-type="suspended" role="tab" aria-selected="false" aria-controls="suspendedInputs" id="tab-suspended" tabindex="-1">Suspended</button>
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="dateOfSentence">Date of sentence</label>
+            <span class="govuk-hint">Use the pronouncement date.</span>
+            <input class="govuk-input" id="dateOfSentence" name="dateOfSentence" type="date" required>
+          </div>
+
+          <div id="lifeInputs" class="govuk-form-group" role="tabpanel" aria-labelledby="tab-life" aria-hidden="false">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">Minimum term (tariff)</legend>
+              <span class="govuk-hint">Enter the tariff to the nearest day. Weeks are converted to 7-day blocks.</span>
+              <div class="govuk-body quick-links govuk-!-margin-top-2">
+                <strong class="govuk-!-margin-right-2">Example:</strong>
+                <a href="#" id="testLifeBtn" class="govuk-link govuk-link--no-visited-state">Life example</a>
+              </div>
+              <div class="govuk-date-input">
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="minYears">Years</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-3" id="minYears" type="number" value="0" min="0">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="minMonths">Months</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="minMonths" type="number" value="0" min="0" max="11">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="minWeeks">Weeks</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="minWeeks" type="number" value="0" min="0">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="minDays">Days</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="minDays" type="number" value="0" min="0" max="6">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div id="determinateInputs" class="govuk-form-group" role="tabpanel" aria-labelledby="tab-determinate" aria-hidden="true" style="display:none">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">Determinate term</legend>
+              <span class="govuk-hint">Enter the headline term passed before credits or activation adjustments.</span>
+              <div class="govuk-body quick-links govuk-!-margin-top-2">
+                <strong class="govuk-!-margin-right-2">Example:</strong>
+                <a href="#" id="testDeterminateBtn" class="govuk-link govuk-link--no-visited-state">Determinate example</a>
+              </div>
+              <div class="govuk-date-input">
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="detYears">Years</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-3" id="detYears" type="number" value="0" min="0">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="detMonths">Months</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="detMonths" type="number" value="0" min="0" max="11">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="detWeeks">Weeks</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="detWeeks" type="number" value="0" min="0">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="detDays">Days</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="detDays" type="number" value="0" min="0" max="6">
+                </div>
+              </div>
+              <div class="govuk-form-group govuk-!-margin-top-3">
+                <label class="govuk-label" for="releaseFraction">Custody proportion (discount)</label>
+                <span class="govuk-hint">Standard determinate sentences use 1/2. Use 2/3 where statute requires, or 100% for whole-term custody.</span>
+                <select class="govuk-select" id="releaseFraction">
+                  <option value="0.5">1/2 in custody (standard)</option>
+                  <option value="0.6667">2/3 in custody</option>
+                  <option value="1.0">100% in custody</option>
+                </select>
+              </div>
+            </fieldset>
+          </div>
+
+          <div id="aggregateInputs" class="govuk-form-group" role="tabpanel" aria-labelledby="tab-aggregate" aria-hidden="true" style="display:none">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">Aggregate (concurrent / consecutive) terms</legend>
+              <span class="govuk-hint">Add one row per count. Use a group number for concurrent counts; consecutive rows stack on top.</span>
+              <div class="govuk-body quick-links govuk-!-margin-top-2">
+                <strong class="govuk-!-margin-right-2">Example:</strong>
+                <a href="#" id="testAggregateBtn" class="govuk-link govuk-link--no-visited-state">Aggregate example</a>
+              </div>
+              <div class="govuk-form-group">
+                <table class="govuk-table">
+                  <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                      <th scope="col" class="govuk-table__header">Relation</th>
+                      <th scope="col" class="govuk-table__header">Concurrent group</th>
+                      <th scope="col" class="govuk-table__header">Years</th>
+                      <th scope="col" class="govuk-table__header">Months</th>
+                      <th scope="col" class="govuk-table__header">Weeks</th>
+                      <th scope="col" class="govuk-table__header">Days</th>
+                      <th scope="col" class="govuk-table__header">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody id="componentsBody" class="govuk-table__body"></tbody>
+                </table>
+                <p class="govuk-hint govuk-!-margin-top-2">Click "Add count" for each term to include. Concurrent rows with the same group number will use the longest term in that group.</p>
+                <button class="govuk-button govuk-button--secondary" type="button" id="addComponentBtn">Add count</button>
+              </div>
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="aggReleaseFraction">Custody proportion after aggregation</label>
+                <span class="govuk-hint">Used to work out ERD once the concurrent/consecutive total has been built.</span>
+                <select class="govuk-select" id="aggReleaseFraction">
+                  <option value="0.5">1/2 in custody (standard)</option>
+                  <option value="0.6667">2/3 in custody</option>
+                  <option value="1.0">100% in custody</option>
+                </select>
+              </div>
+            </fieldset>
+          </div>
+
+          <div id="suspendedInputs" class="govuk-form-group" role="tabpanel" aria-labelledby="tab-suspended" aria-hidden="true" style="display:none">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend">Suspended term</legend>
+              <span class="govuk-hint">Enter the headline suspended term. If activated, set the activation date to anchor the calculation.</span>
+              <div class="govuk-body quick-links govuk-!-margin-top-2">
+                <strong class="govuk-!-margin-right-2">Example:</strong>
+                <a href="#" id="testSuspendedBtn" class="govuk-link govuk-link--no-visited-state">Suspended example</a>
+              </div>
+              <div class="govuk-date-input">
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="susYears">Years</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-3" id="susYears" type="number" value="0" min="0">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="susMonths">Months</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="susMonths" type="number" value="0" min="0" max="11">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="susWeeks">Weeks</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="susWeeks" type="number" value="0" min="0">
+                </div>
+                <div class="govuk-date-input__item">
+                  <label class="govuk-label" for="susDays">Days</label>
+                  <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="susDays" type="number" value="0" min="0" max="6">
+                </div>
+              </div>
+              <div class="govuk-form-group govuk-!-margin-top-3">
+                <label class="govuk-label" for="susReleaseFraction">Custody proportion (if activated)</label>
+                <select class="govuk-select" id="susReleaseFraction">
+                  <option value="0.5">1/2 in custody (standard)</option>
+                  <option value="0.6667">2/3 in custody</option>
+                  <option value="1.0">100% in custody</option>
+                </select>
+              </div>
+              <div class="govuk-form-group govuk-!-margin-top-3">
+                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="isActivated" type="checkbox" value="true">
+                    <label class="govuk-label govuk-checkboxes__label" for="isActivated">Mark as activated</label>
+                  </div>
+                </div>
+                <span class="govuk-hint">Tick when the suspended term has been activated so the tool will calculate an ERD and end date.</span>
+                <div id="activationDateBlock" class="govuk-form-group govuk-!-margin-top-2" style="display:none">
+                  <label class="govuk-label" for="activationDate">Activation date</label>
+                  <span class="govuk-hint">Date the court activated the suspended sentence.</span>
+                  <input class="govuk-input" id="activationDate" type="date">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="remandDays">Remand days</label>
+            <span class="govuk-hint">One-for-one credit for time in custody before sentence.</span>
+            <input class="govuk-input govuk-input--width-5" id="remandDays" type="number" value="0" min="0">
+          </div>
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="taggedBailDays">Tagged bail days</label>
+            <span class="govuk-hint">Counts as half days. Rounded up to the nearest full day.</span>
+            <input class="govuk-input govuk-input--width-5" id="taggedBailDays" type="number" value="0" min="0">
+          </div>
+
+          <div class="govuk-button-group govuk-!-margin-top-4">
+            <button class="govuk-button" type="button" id="calcBtn">Calculate</button>
+            <button class="govuk-button govuk-button--warning" type="button" id="clearFormBtn">Clear form</button>
+            <button class="govuk-button govuk-button--secondary" type="button" id="printSummaryBtn" disabled>Save summary as PDF</button>
+          </div>
+          <p class="govuk-hint govuk-!-margin-bottom-0">Calculate uses the selections above. Clear form wipes all inputs and results. Saving as PDF is available after a calculation.</p>
+        </fieldset>
+      </form>
+
+      <div class="govuk-form-group govuk-!-margin-top-6">
+        <h2 class="govuk-heading-m">Result</h2>
+        <p class="govuk-body">Dates are inclusive and calculated in UTC to avoid daylight saving jumps.</p>
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Sentence end date</dt>
+            <dd class="govuk-summary-list__value" id="sentenceEnd">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Earliest release date (ERD)</dt>
+            <dd class="govuk-summary-list__value" id="erdDate">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Tariff expiry (life)</dt>
+            <dd class="govuk-summary-list__value" id="tariffExpiry">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Total custodial days</dt>
+            <dd class="govuk-summary-list__value" id="totalDays">-</dd>
+          </div>
+        </dl>
+
+        <h3 class="govuk-heading-s">Breakdown</h3>
+        <dl class="govuk-summary-list">
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Period (years, months, weeks, days)</dt>
+            <dd class="govuk-summary-list__value" id="periodYMWD">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Period (years and days)</dt>
+            <dd class="govuk-summary-list__value" id="periodYearsDays">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Calendar variance</dt>
+            <dd class="govuk-summary-list__value" id="calendarVariance">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Remand credit</dt>
+            <dd class="govuk-summary-list__value" id="remandCredit">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Tagged bail credit</dt>
+            <dd class="govuk-summary-list__value" id="taggedCredit">-</dd>
+          </div>
+          <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Total credit</dt>
+            <dd class="govuk-summary-list__value" id="totalCredit">-</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+        <!-- Local GOV.UK Frontend JS -->
+    <script src="vendor/govuk-frontend.min.js"></script>
+    <script>window.GOVUKFrontend && GOVUKFrontend.initAll();</script>
+
+    <!-- Libraries needed for PDF/print (local copies) -->
+    <script src="vendor/html2canvas.min.js"></script>
+    <script src="vendor/jspdf.umd.min.js"></script>
+
+    <!-- Your scripts -->
+    <script src="calc.js"></script>
+    <script src="app.js"></script>
+    <script src="print-summary.js"></script>
+  </main>
+</body>
+</html>
