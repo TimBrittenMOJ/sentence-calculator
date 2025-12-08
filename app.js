@@ -126,7 +126,7 @@ document.getElementById('clearFormBtn').addEventListener('click', function() {
   document.getElementById('isActivated').checked = false;
   document.getElementById('activationDateBlock').style.display = 'none';
   document.getElementById('componentsBody').innerHTML = '';
-  ['sentenceEnd','erdDate','tariffExpiry','totalDays','periodYMWD','periodYearsDays','calendarVariance',
+  ['totalDays','periodYMWD','periodYearsDays','calendarVariance',
    'remandCredit','taggedCredit','totalCredit'
   ].forEach(id => { document.getElementById(id).textContent = '-'; });
   document.getElementById('printSummaryBtn').disabled = true;
@@ -246,22 +246,11 @@ function buildPayloadFromUI() {
 
 // Render results
 function renderResult(result) {
-  function fmtDateUTC(d) {
-    if (!d) return '-';
-    const date = new Date(d);
-    if (isNaN(date)) return '-';
-    return String(date.getUTCDate()).padStart(2,'0') + '/'
-         + String(date.getUTCMonth()+1).toString().padStart(2,'0') + '/'
-         + date.getUTCFullYear();
-  }
   function fmtNum(n) {
     if (typeof n !== 'number' || isNaN(n)) return '-';
     return n.toLocaleString('en-GB');
   }
 
-  document.getElementById('sentenceEnd').textContent = fmtDateUTC(result.sentenceEnd);
-  document.getElementById('erdDate').textContent     = fmtDateUTC(result.erdDate);
-  document.getElementById('tariffExpiry').textContent= fmtDateUTC(result.tariffExpiry);
   document.getElementById('totalDays').textContent   = fmtNum(result.totalDaysInclusive);
 
   document.getElementById('periodYMWD').textContent  = result.periodStr || '-';
@@ -270,7 +259,7 @@ function renderResult(result) {
   const cv = result.calendarVariance || {};
   const varianceStr = (cv.totalAdjustment === undefined)
     ? '-'
-    : `${cv.totalAdjustment >= 0 ? '+' : ''}${cv.totalAdjustment} days (leap days: ${cv.leapDays}, months adj: ${cv.monthAdjustment})`;
+    : `${cv.totalAdjustment >= 0 ? '+' : ''}${cv.totalAdjustment} days (leap days: ${cv.leapDays}, months adj: ${cv.monthAdjustment} from real month lengths vs 30-day months)`;
   document.getElementById('calendarVariance').textContent = varianceStr;
 
   const remandCredit = Number(result.remandDays || 0);
